@@ -2,6 +2,7 @@ import MainLayout from "@/layouts/MainLayout";
 import AppointmentPage from "@/pages/appointment/Appointment";
 import BillingPage from "@/pages/billing/Billing";
 import DashboardPage from "@/pages/Dashboard";
+import DepartmentPage from "@/pages/department/Department";
 import ErrorPage from "@/pages/Error";
 import ExpensePage from "@/pages/expense/Expense";
 import InventoryPage from "@/pages/inventory/Inventory";
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: "user",
         element: <UserPage/>,
+      },
+      {
+        path: "department",
+        element: <DepartmentPage/>,
       },
       {
         path: "dashboard",
