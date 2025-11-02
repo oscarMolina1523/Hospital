@@ -5,6 +5,7 @@ import DashboardPage from "@/pages/Dashboard";
 import ErrorPage from "@/pages/Error";
 import ExpensePage from "@/pages/expense/Expense";
 import InventoryPage from "@/pages/inventory/Inventory";
+import MedicationPage from "@/pages/medication/Medication";
 import UserPage from "@/pages/user/User";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "inventory",
         element: <InventoryPage/>,
+      },
+      {
+        path: "medication",
+        element: <MedicationPage/>,
       },
       {
         path: "user",

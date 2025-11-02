@@ -1,4 +1,4 @@
-import { Book, Calendar, ChartArea, Pill, User2, Wallet } from "lucide-react";
+import { Book, Calendar, ChartArea, Pill, PillBottle, User2, Wallet } from "lucide-react";
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -7,6 +7,7 @@ const items = [
   { title: "Facturacion", url: "/billing", icon: Book },
   { title: "Gastos", url: "/expense", icon: Wallet },
   { title: "Inventario", url: "/inventory", icon: Pill },
+  { title: "Medicamentos", url: "/medication", icon: PillBottle },
   { title: "Usuarios", url: "/user", icon: User2 },
   { title: "Crecimiento monetario", url: "/dashboard", icon: ChartArea },
 ];
