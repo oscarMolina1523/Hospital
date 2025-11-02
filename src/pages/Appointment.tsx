@@ -72,6 +72,7 @@ const AppointmentPage: React.FC = () => {
           ))}
         </div>
       </div>
+      
     </div>
   );
 };
