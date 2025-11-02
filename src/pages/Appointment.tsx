@@ -1,24 +1,17 @@
-import { Button } from "@/components/ui/button";
 import React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
-
-const data = [
-  {
-    name: "Ana López",
-    doctor: "Dr. Pérez",
-    department: "Cardiología",
-    date: "15:30",
-    status: "Scheduled",
-  },
-  {
-    name: "Juan Ortiz",
-    doctor: "Dr. Garcia",
-    department: "Pediatria",
-    date: "10:00",
-    status: "Canceled",
-  },
-];
+import {
+  ColumnDef,
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel
+} from "@tanstack/react-table"
+import { Button } from "@/components/ui/button"
+import { Table, TableHeader, TableBody, TableCell } from "@/components/ui/table"
+import { appointmentData as data } from "@/data/appointment.data";
 
 const AppointmentPage: React.FC = () => {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
@@ -46,8 +39,7 @@ const AppointmentPage: React.FC = () => {
             <div key={index} className="flex flex-row bg-[#f8fafc] rounded-2xl p-4">
               <div>
                 <p className="text-left">
-                  Paciente: {item.name} — {item.doctor} ({item.department}) —{" "}
-                  {item.date}
+                  Paciente: {item.patientId} — {item.doctorId} ({item.departmentId}) — {item.scheduledAt.toLocaleTimeString('es-NI', { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
               <div>
@@ -62,7 +54,7 @@ const AppointmentPage: React.FC = () => {
             <div key={index} className="flex flex-row bg-[#f8fafc] rounded-2xl p-4">
               <div>
                 <p className="text-left">
-                  Paciente: {item.name} — {item.doctor} ({item.department}) — {item.date}
+                  Paciente: {item.patientId} — {item.doctorId} ({item.departmentId}) — {item.scheduledAt.toLocaleTimeString('es-NI', { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
               <div>
@@ -72,7 +64,9 @@ const AppointmentPage: React.FC = () => {
           ))}
         </div>
       </div>
-      
+      {/* table */}
+
+
     </div>
   );
 };
