@@ -29,15 +29,15 @@ export const BillingPage: React.FC = () => {
       <div className="grid grid-cols-3 gap-2 w-full h-24">
         <div className="border border-gray-300 rounded-2xl text-left flex flex-col gap-2 p-4">
           <span className="text-[#475569] ">Total facturado este mes</span>
-          <span className="font-semibold text-[2rem]">$1000</span>
+          <span className="font-semibold text-[2rem]">C$1000</span>
         </div>
         <div className="border border-gray-300 rounded-2xl text-left flex flex-col gap-2 p-4">
           <span className="text-[#475569] ">Pendiente</span>
-          <span className="font-semibold text-[2rem]">$150</span>
+          <span className="font-semibold text-[2rem]">C$150</span>
         </div>
         <div className="border border-gray-300 rounded-2xl text-left flex flex-col gap-2 p-4">
           <span className="text-[#475569] ">Pagado</span>
-          <span className="font-semibold text-[2rem]">$1800</span>
+          <span className="font-semibold text-[2rem]">C$1800</span>
         </div>
       </div>
       {/* table */}
