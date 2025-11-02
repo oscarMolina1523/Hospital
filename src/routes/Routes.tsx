@@ -3,7 +3,7 @@ import AppointmentPage from "@/pages/appointment/Appointment";
 import BillingPage from "@/pages/billing/Billing";
 import DashboardPage from "@/pages/Dashboard";
 import ErrorPage from "@/pages/Error";
-import ExpensePage from "@/pages/Expense";
+import ExpensePage from "@/pages/expense/Expense";
 import InventoryPage from "@/pages/Inventory";
 import UserPage from "@/pages/User";
 import { createBrowserRouter, Navigate } from "react-router-dom";
