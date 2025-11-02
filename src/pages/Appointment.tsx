@@ -9,14 +9,14 @@ const data = [
     doctor: "Dr. Pérez",
     department: "Cardiología",
     date: "15:30",
-    status:"Scheduled"
+    status: "Scheduled",
   },
   {
     name: "Juan Ortiz",
     doctor: "Dr. Garcia",
     department: "Pediatria",
     date: "10:00",
-    status:"Canceled"
+    status: "Canceled",
   },
 ];
 
@@ -42,8 +42,8 @@ const AppointmentPage: React.FC = () => {
         />
         <div className="border flex flex-col gap-4 max-w-92 rounded-2xl p-4 border-gray-300">
           <p className="font-medium leading-2">Citas del día</p>
-          {data.map((item) => (
-            <div className="flex flex-row bg-[#f8fafc] rounded-2xl p-4">
+          {data.map((item, index) => (
+            <div key={index} className="flex flex-row bg-[#f8fafc] rounded-2xl p-4">
               <div>
                 <p className="text-left">
                   Paciente: {item.name} — {item.doctor} ({item.department}) —{" "}
@@ -58,16 +58,18 @@ const AppointmentPage: React.FC = () => {
         </div>
         <div className="border flex flex-col gap-4 max-w-92 rounded-2xl p-4 border-gray-300">
           <p className="font-medium leading-2">Proximas citas</p>
-          <div className="flex flex-row bg-[#f8fafc] rounded-2xl p-4">
-            <div>
-              <p className="text-left">
-                Paciente: Ana López — Dr. Pérez (Cardiología) — 15:30
-              </p>
+          {data.map((item, index) => (
+            <div key={index} className="flex flex-row bg-[#f8fafc] rounded-2xl p-4">
+              <div>
+                <p className="text-left">
+                  Paciente: {item.name} — {item.doctor} ({item.department}) — {item.date}
+                </p>
+              </div>
+              <div>
+                <Badge variant="destructive">{item.status}</Badge>
+              </div>
             </div>
-            <div>
-              <Badge variant="destructive">Scheduled</Badge>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
