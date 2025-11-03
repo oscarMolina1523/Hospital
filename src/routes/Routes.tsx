@@ -6,6 +6,7 @@ import DepartmentPage from "@/pages/department/Department";
 import ErrorPage from "@/pages/Error";
 import ExpensePage from "@/pages/expense/Expense";
 import InventoryPage from "@/pages/inventory/Inventory";
+import AuditLogPage from "@/pages/logs/AuditLog";
 import MedicalServicePage from "@/pages/medicalService/MedicalService";
 import MedicationPage from "@/pages/medication/Medication";
 import PatientPage from "@/pages/patients/Patient";
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
       {
         path: "department",
         element: <DepartmentPage/>,
+      },
+      {
+        path: "log",
+        element: <AuditLogPage/>,
       },
       {
         path: "dashboard",
