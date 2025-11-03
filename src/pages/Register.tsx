@@ -33,7 +33,7 @@ const RegisterPage: React.FC = () => {
           placeholder="ej. *********"
         />
       </div>
-      <Button className="bg-blue-600">Registrarse</Button>
+      <Button onClick={() => navigate("/home")} className="bg-blue-600">Registrarse</Button>
       <div className="flex flex-row gap-2 w-full text-surface-neutral items-center">
         <div className="w-1/2 h-px bg-black"></div>
         <label className="text-surface-neutral">or</label>
