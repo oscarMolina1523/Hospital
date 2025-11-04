@@ -1,4 +1,4 @@
-import { Accessibility, Book, BrickWallShield, Calendar, ChartArea, ClipboardClock, Home, Pill, PillBottle, Stethoscope, User2, Wallet } from "lucide-react";
+import { Accessibility, Book, BrickWallShield, Calendar, ChartArea, ClipboardClock, Home, LogOut, Pill, PillBottle, Stethoscope, User2, Wallet } from "lucide-react";
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -21,6 +21,12 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+
+    navigate("/auth", { replace: true });
+  };
+
   return (
     <div className="bg-white h-full rounded-2xl items-start justify-start flex flex-col gap-2 p-4">
       {items.map((item) => {
@@ -38,6 +44,10 @@ const Sidebar: React.FC = () => {
           </div>
         );
       })}
+      <div className="flex flex-row gap-2 w-full rounded-xl h-8 p-2 items-center justify-start cursor-pointer transition-colors hover:bg-sky-300 hover:text-white" onClick={handleLogout}>
+        <LogOut className="w-4 h-4"/>
+        Cerrar Sesion
+      </div>
     </div>
   );
 };

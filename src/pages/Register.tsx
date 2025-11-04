@@ -10,6 +10,14 @@ const RegisterPage: React.FC = () => {
     <div className="flex flex-col gap-4">
       <h2 className="text-[1.3rem]">Registrarse</h2>
       <div className="flex flex-col items-start min-w-[20rem]">
+        <label>Nombre completo</label>
+        <Input
+          className="bg-gray-200 focus:bg-white"
+          type="text"
+          placeholder="ej. Eduardo Nahum Rigoberto"
+        />
+      </div>
+      <div className="flex flex-col items-start min-w-[20rem]">
         <label>Correo electrónico</label>
         <Input
           className="bg-gray-200 focus:bg-white"
@@ -33,7 +41,9 @@ const RegisterPage: React.FC = () => {
           placeholder="ej. *********"
         />
       </div>
-      <Button onClick={() => navigate("/home")} className="bg-blue-600">Registrarse</Button>
+      <Button onClick={() => navigate("/home")} className="bg-blue-600">
+        Registrarse
+      </Button>
       <div className="flex flex-row gap-2 w-full text-surface-neutral items-center">
         <div className="w-1/2 h-px bg-black"></div>
         <label className="text-surface-neutral">or</label>
