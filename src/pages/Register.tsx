@@ -39,7 +39,7 @@ const RegisterPage: React.FC = () => {
 
     try {
       await authService.signUp(name, email, password);
-      navigate("/home");
+      navigate("/auth/login");
     } catch (error) {
       setError(`${error}`);
     }
