@@ -5,8 +5,8 @@ export default class KPI extends BaseModel {
   name: string; // Crecimiento de pacientes, ingresos, stock crítico
   value: number;
   metricDate: Date;
-  createdAt: Date;
-  createdBy: string;
+  createdAt?: Date;
+  createdBy?: string;
 
   constructor({
     id,
@@ -22,8 +22,8 @@ export default class KPI extends BaseModel {
     departmentId?: string;
     value: number;
     metricDate: Date;
-    createdAt: Date;
-    createdBy: string;
+    createdAt?: Date;
+    createdBy?: string;
   }) {
     super(id);
     this.name = name;
