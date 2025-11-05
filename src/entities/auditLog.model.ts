@@ -35,7 +35,7 @@ export default class AuditLog extends BaseModel {
     this.performedBy = performedBy;
   }
 
-  // ✅ Crea una instancia desde el JSON crudo del backend
+  // Crea una instancia desde el JSON crudo del backend
   static fromJson(json: any): AuditLog {
     const id = String(json["id"] || "");
     const entity = String(json["entity"] || "");
