@@ -10,7 +10,7 @@ export default class Billing extends BaseModel {
   amount: number; // Monto total (calculado)
   status: BillingStatus;
   paymentMethod: Payment;
-  createdAt: Date;
+  createdAt?: Date;
   paidAt?: Date;
 
   constructor({
@@ -33,7 +33,7 @@ export default class Billing extends BaseModel {
     amount: number;
     status: BillingStatus;
     paymentMethod: Payment;
-    createdAt: Date;
+    createdAt?: Date;
     paidAt?: Date;
   }) {
     super(id);
@@ -46,5 +46,74 @@ export default class Billing extends BaseModel {
     this.paymentMethod = paymentMethod;
     this.createdAt = createdAt;
     this.paidAt = paidAt;
+  }
+
+  static fromJson(json: any): Billing {
+    const id = String(json["id"] || "");
+    const patientId = String(json["patientId"] || "");
+    const appointmentId = json["appointmentId"]
+      ? String(json["appointmentId"])
+      : undefined;
+    const serviceId = String(json["serviceId"] || "");
+    const departmentId = String(json["departmentId"] || "");
+    const amount = Number(json["amount"] || 0);
+    const status = (json["status"] as BillingStatus) || BillingStatus.PENDING;
+    const paymentMethod = (json["paymentMethod"] as Payment) || Payment.CASH;
+    const createdAt = json["createdAt"]
+      ? new Date(json["createdAt"])
+      : new Date();
+    const paidAt = json["paidAt"] ? new Date(json["paidAt"]) : undefined;
+
+    return new Billing({
+      id,
+      patientId,
+      appointmentId,
+      serviceId,
+      departmentId,
+      amount,
+      status,
+      paymentMethod,
+      createdAt,
+      paidAt,
+    });
+  }
+
+  static fromJsonModel(json: any): Billing {
+    const id = String(json["id"] || "");
+    const patientId = String(json["patientId"] || "");
+    const appointmentId = json["appointmentId"]
+      ? String(json["appointmentId"])
+      : undefined;
+    const serviceId = String(json["serviceId"] || "");
+    const departmentId = String(json["departmentId"] || "");
+    const amount = Number(json["amount"] || 0);
+    const status = (json["status"] as BillingStatus) || BillingStatus.PENDING;
+    const paymentMethod = (json["paymentMethod"] as Payment) || Payment.CASH;
+    const paidAt = json["paidAt"] ? new Date(json["paidAt"]) : undefined;
+
+    return new Billing({
+      id,
+      patientId,
+      appointmentId,
+      serviceId,
+      departmentId,
+      amount,
+      status,
+      paymentMethod,
+      paidAt,
+    });
+  }
+
+  toJsonDTO() {
+    return {
+      patientId: this.patientId,
+      appointmentId: this.appointmentId,
+      serviceId: this.serviceId,
+      departmentId: this.departmentId,
+      amount: this.amount,
+      status: this.status,
+      paymentMethod: this.paymentMethod,
+      paidAt: this.paidAt ? this.paidAt.toISOString() : undefined,
+    };
   }
 }
