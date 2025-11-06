@@ -20,12 +20,8 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const fetchAppointments = useCallback(async () => {
-    if (isLoaded && appointments.length > 0) {
-      console.log("⚡ Citas ya cargadas, no se hace refetch");
-      return;
-    }
+    if (isLoaded && appointments.length > 0) return;
 
-    console.log("📡 Fetching appointments...");
     setLoadingAppointment(true);
     try {
       const allAppointments = await appointmentService.getAppointments();

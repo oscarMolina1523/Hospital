@@ -1,11 +1,22 @@
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useEffect } from "react";
 import { getBillingColumns } from "./billingColumns";
 import type Billing from "@/entities/billing.model";
 import { DataTable } from "@/components/dataTable";
-import { billingData as data } from "@/data/billing.data";
+import { useBillingContext } from "@/context/BillingContext";
 
 export const BillingPage: React.FC = () => {
+  const {
+    billings: data,
+    loadingBilling,
+    errorBilling,
+    fetchBillings,
+  } = useBillingContext();
+
+  useEffect(() => {
+    fetchBillings();
+  }, [fetchBillings]);
+
   function handleEdit(billing: Billing) {
     console.log("Editar factura:", billing);
   }
@@ -15,6 +26,14 @@ export const BillingPage: React.FC = () => {
   }
 
   const columns = getBillingColumns(handleEdit, handleDelete);
+
+  if (loadingBilling) {
+    return <div className="p-4 text-gray-500">Cargando facturas...</div>;
+  }
+
+  if (errorBilling) {
+    return <div className="p-4 text-red-600">Error: {errorBilling}</div>;
+  }
 
   return (
     <div className="bg-white h-full rounded-2xl items-start justify-start flex flex-col gap-2 p-4">

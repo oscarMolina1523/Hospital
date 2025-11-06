@@ -34,7 +34,7 @@ const AppointmentPage: React.FC = () => {
   const columns = getAppointmentColumns(handleEdit, handleDelete);
 
   if (loadingAppointment) {
-    return <div className="p-4 text-gray-500">Cargando usuarios...</div>;
+    return <div className="p-4 text-gray-500">Cargando citas...</div>;
   }
 
   if (errorAppointment) {
