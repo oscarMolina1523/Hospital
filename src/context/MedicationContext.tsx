@@ -19,12 +19,8 @@ export const MedicationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const fetchMedications = useCallback(async () => {
-    if (isLoaded && medications.length > 0) {
-      console.log("⚡ Medications already loaded, no refetch");
-      return;
-    }
+    if (isLoaded && medications.length > 0) return;
 
-    console.log("📡 Fetching medications...");
     setLoadingMedication(true);
     try {
       const allMedications = await medicationService.getMedications();
