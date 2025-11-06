@@ -1,11 +1,17 @@
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useEffect } from "react";
 import { getRoleColumns } from "./roleColumns";
-import { roleData as data } from "@/data/role.data";
 import type Role from "@/entities/role.model";
 import { DataTable } from "@/components/dataTable";
+import { useRoleContext } from "@/context/RoleContext";
 
 const RolePage: React.FC = () => {
+  const { roles: data, loadingRole, errorRole, fetchRoles } = useRoleContext();
+
+  useEffect(() => {
+    fetchRoles();
+  }, [fetchRoles]);
+
   function handleEdit(role: Role) {
     console.log("Editar role:", role);
     // Aquí puedes abrir un modal o navegar a otra ruta:
@@ -18,6 +24,14 @@ const RolePage: React.FC = () => {
   }
 
   const columns = getRoleColumns(handleEdit, handleDelete);
+
+  if (loadingRole) {
+    return <div className="p-4 text-gray-500">Cargando roles...</div>;
+  }
+
+  if (loadingRole) {
+    return <div className="p-4 text-red-600">Error: {loadingRole}</div>;
+  }
 
   return (
     <div className="p-4 rounded-2xl bg-white w-full flex flex-col gap-2">

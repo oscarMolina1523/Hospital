@@ -5,6 +5,7 @@ import type Inventory from "@/entities/inventory.model";
 import type MedicalService from "@/entities/medicalService.model";
 import type { Medication } from "@/entities/medication.model";
 import type Patient from "@/entities/patient.model";
+import type Role from "@/entities/role.model";
 import type User from "@/entities/user.model";
 
 export type UserContextType = {
@@ -81,4 +82,12 @@ export type PatientContextType = {
   fetchPatients: () => Promise<void>;
   fetchPatientsByDepartment: () => Promise<void>;
   refetchPatients: () => Promise<void>;
+};
+
+export type RoleContextType = {
+  roles: Role[];
+  loadingRole: boolean;
+  errorRole?: string;
+  fetchRoles: () => Promise<void>;
+  refetchRoles: () => Promise<void>;
 };
