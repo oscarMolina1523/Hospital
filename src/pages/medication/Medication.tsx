@@ -1,11 +1,22 @@
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useEffect } from "react";
 import { getMedicationColumns } from "./medicationColumns";
-import { medicationData as data } from "@/data/medication.data";
 import type { Medication } from "@/entities/medication.model";
 import { DataTable } from "@/components/dataTable";
+import { useMedicationContext } from "@/context/MedicationContext";
 
 const MedicationPage: React.FC = () => {
+  const {
+    medications: data,
+    loadingMedication,
+    errorMedication,
+    fetchMedications,
+  } = useMedicationContext();
+
+  useEffect(() => {
+    fetchMedications();
+  }, [fetchMedications]);
+
   function handleEdit(medication: Medication) {
     console.log("Editar medication:", medication);
   }
@@ -15,6 +26,14 @@ const MedicationPage: React.FC = () => {
   }
 
   const columns = getMedicationColumns(handleEdit, handleDelete);
+
+  if (loadingMedication) {
+    return <div className="p-4 text-gray-500">Cargando medicamentos...</div>;
+  }
+
+  if (errorMedication) {
+    return <div className="p-4 text-red-600">Error: {errorMedication}</div>;
+  }
 
   return (
     <div className="bg-white h-full rounded-2xl items-start justify-start flex flex-col gap-2 p-4">

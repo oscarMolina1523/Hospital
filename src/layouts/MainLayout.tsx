@@ -4,6 +4,7 @@ import { AppointmentProvider } from "@/context/AppointmentContext";
 import { BillingProvider } from "@/context/BillingContext";
 import { ExpenseProvider } from "@/context/ExpenseContext";
 import { InventoryProvider } from "@/context/InventoryContext";
+import { MedicationProvider } from "@/context/MedicationContext";
 import { UserProvider } from "@/context/UserContext";
 import React from "react";
 import { Outlet } from "react-router-dom";
@@ -16,19 +17,21 @@ const MainLayout: React.FC = () => {
         <div className="w-1/4 px-2">
           <Sidebar />
         </div>
-        <InventoryProvider>
-          <ExpenseProvider>
-            <BillingProvider>
-              <AppointmentProvider>
-                <UserProvider>
-                  <div className="w-3/4 px-2">
-                    <Outlet />
-                  </div>
-                </UserProvider>
-              </AppointmentProvider>
-            </BillingProvider>
-          </ExpenseProvider>
-        </InventoryProvider>
+        <MedicationProvider>
+          <InventoryProvider>
+            <ExpenseProvider>
+              <BillingProvider>
+                <AppointmentProvider>
+                  <UserProvider>
+                    <div className="w-3/4 px-2">
+                      <Outlet />
+                    </div>
+                  </UserProvider>
+                </AppointmentProvider>
+              </BillingProvider>
+            </ExpenseProvider>
+          </InventoryProvider>
+        </MedicationProvider>
       </div>
     </div>
   );
