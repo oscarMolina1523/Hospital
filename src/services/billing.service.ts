@@ -15,6 +15,12 @@ export default class BillingService extends HTTPService {
     return data.map((item: any) => Billing.fromJson(item));
   }
 
+  async getBillingByDepartment() {
+    const response = await super.get(`${this.path}/area`);
+    const data = response.data || [];
+    return data.map((item: any) => Billing.fromJson(item));
+  }
+
   async getById(id: string): Promise<Billing | null> {
     const response = await super.get(`${this.path}/${id}`);
     if (!response) return null;

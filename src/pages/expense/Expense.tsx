@@ -1,11 +1,22 @@
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useEffect } from "react";
 import { getExpenseColumns } from "./expenseColumns";
 import type Expense from "@/entities/expense.model";
-import { expenseData as data } from "@/data/expense.data";
 import { DataTable } from "@/components/dataTable";
+import { useExpenseContext } from "@/context/ExpenseContext";
 
 const ExpensePage: React.FC = () => {
+  const {
+    expenses: data,
+    loadingExpense,
+    errorExpense,
+    fetchExpenses,
+  } = useExpenseContext();
+
+  useEffect(() => {
+    fetchExpenses();
+  }, [fetchExpenses]);
+
   function handleEdit(expense: Expense) {
     console.log("Editar expense:", expense);
   }
@@ -15,6 +26,14 @@ const ExpensePage: React.FC = () => {
   }
 
   const columns = getExpenseColumns(handleEdit, handleDelete);
+
+  if (loadingExpense) {
+    return <div className="p-4 text-gray-500">Cargando gastos...</div>;
+  }
+
+  if (errorExpense) {
+    return <div className="p-4 text-red-600">Error: {errorExpense}</div>;
+  }
 
   return (
     <div className="bg-white h-full rounded-2xl items-start justify-start flex flex-col gap-2 p-4">

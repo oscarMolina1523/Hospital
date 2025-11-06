@@ -1,5 +1,6 @@
 import type Appointment from "@/entities/appointment.model";
 import type Billing from "@/entities/billing.model";
+import type Expense from "@/entities/expense.model";
 import type User from "@/entities/user.model";
 
 export type UserContextType = {
@@ -28,4 +29,14 @@ export type BillingContextType = {
   errorBilling?: string;
   fetchBillings: () => Promise<void>;
   refetchBillings: () => Promise<void>;
+};
+
+export type ExpenseContextType = {
+  expenses: Expense[];
+  expensesByDepartment:Expense[];
+  loadingExpense: boolean;
+  errorExpense?: string;
+  fetchExpenses: () => Promise<void>;
+  fetchExpensesByDepartment: () => Promise<void>;
+  refetchExpenses: () => Promise<void>;
 };
