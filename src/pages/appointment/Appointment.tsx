@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import type { AppointmentStatus } from "@/entities/appointment.enum";
+import { AppointmentStatus } from "@/entities/appointment.enum";
 
 const service = new AppointmentService();
 
@@ -35,7 +35,7 @@ const AppointmentPage: React.FC = () => {
   const patientRef = useRef<HTMLInputElement>(null);
   const departmentRef = useRef<HTMLInputElement>(null);
   const doctorRef = useRef<HTMLInputElement>(null);
-  const statusRef = useRef<HTMLInputElement>(null);
+  const statusRef = useRef<HTMLSelectElement>(null);
   const scheduledRef = useRef<HTMLInputElement>(null);
   const notesRef = useRef<HTMLTextAreaElement>(null);
 
@@ -47,7 +47,14 @@ const AppointmentPage: React.FC = () => {
     e.preventDefault(); // evita que recargue la página
     e.preventDefault();
 
-    if (!patientRef.current || !departmentRef.current || !doctorRef.current || !statusRef.current || !scheduledRef.current) return;
+    if (
+      !patientRef.current ||
+      !departmentRef.current ||
+      !doctorRef.current ||
+      !statusRef.current ||
+      !scheduledRef.current
+    )
+      return;
 
     const formData = {
       patientId: patientRef.current.value,
@@ -100,7 +107,13 @@ const AppointmentPage: React.FC = () => {
               Nueva Cita
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent
+            className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto"
+            style={{
+              scrollbarWidth: "none", // Firefox
+              msOverflowStyle: "none", // IE 10+
+            }}
+          >
             <form onSubmit={handleCreate}>
               <DialogHeader>
                 <DialogTitle>Crear nueva cita</DialogTitle>
@@ -124,23 +137,41 @@ const AppointmentPage: React.FC = () => {
                 </div>
                 <div className="grid gap-3">
                   <label htmlFor="status">Estado</label>
-                  <Input id="status" ref={statusRef} />
+                  <select
+                    id="status"
+                    ref={statusRef}
+                    className="border rounded-md p-2"
+                  >
+                    {Object.values(AppointmentStatus).map((status) => (
+                      <option key={status} value={status}>
+                        {status.charAt(0) + status.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="grid gap-3">
                   <label htmlFor="scheduledAt">Programada para:</label>
-                  <Input id="scheduledAt" type="datetime-local" ref={scheduledRef} />
+                  <Input
+                    id="scheduledAt"
+                    type="datetime-local"
+                    ref={scheduledRef}
+                  />
                 </div>
                 <div className="grid gap-3">
                   <label htmlFor="notes">Notas:</label>
-                  <textarea id="notes" ref={notesRef} />
+                  <textarea
+                    className="border border-gray-400"
+                    id="notes"
+                    ref={notesRef}
+                  />
                 </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className="pt-4">
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline">Cancelar</Button>
                 </DialogClose>
                 <Button type="submit" className="bg-sky-600 text-white">
-                  Save changes
+                  Guardar
                 </Button>
               </DialogFooter>
             </form>
