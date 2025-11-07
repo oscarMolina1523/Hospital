@@ -6,6 +6,20 @@ import type Appointment from "@/entities/appointment.model";
 import { DataTable } from "@/components/dataTable";
 import { getAppointmentColumns } from "./appointmentColumns";
 import { useAppointmentContext } from "@/context/AppointmentContext";
+import AppointmentService from "@/services/appointment.service";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+
+const service = new AppointmentService();
 
 const AppointmentPage: React.FC = () => {
   const {
@@ -20,15 +34,16 @@ const AppointmentPage: React.FC = () => {
     fetchAppointments();
   }, [fetchAppointments]);
 
-  function handleEdit(appointment: Appointment) {
-    console.log("Editar cita:", appointment);
-    // Aquí puedes abrir un modal o navegar a otra ruta:
-    // navigate(`/appointments/edit/${appointment.id}`)
+  async function handleCreate(appointment: Appointment) {
+    await service.addAppointment(appointment);
   }
 
-  function handleDelete(id: string) {
-    console.log("Eliminar cita con ID:", id);
-    // Aquí puedes mostrar un confirm() o eliminar desde Firestore
+  async function handleEdit(appointment: Appointment) {
+    await service.updateAppointment(appointment.id, appointment);
+  }
+
+  async function handleDelete(id: string) {
+    await service.deleteAppointment(id);
   }
 
   const columns = getAppointmentColumns(handleEdit, handleDelete);
@@ -47,9 +62,61 @@ const AppointmentPage: React.FC = () => {
         <div>
           <p className="text-[#0f172a] text-[1.25rem] leading-7">Citas</p>
         </div>
-        <div>
-          <Button className="bg-sky-600 text-white">Nueva cita</Button>
-        </div>
+        <Dialog>
+          <form>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="bg-sky-600 text-white">Nueva Cita</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Crear nueva cita</DialogTitle>
+                <DialogDescription>
+                  Estamos creando una nueva cita , se mostrará en la base de datos
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4">
+                <div className="grid gap-3">
+                  <label htmlFor="patient-1">Paciente</label>
+                  <Input id="patientId" name="patient" />
+                </div>
+                <div className="grid gap-3">
+                  <label htmlFor="department-1">Departamento</label>
+                  <Input
+                    id="departmentId"
+                    name="department"
+                  />
+                </div>
+                <div className="grid gap-3">
+                  <label htmlFor="doctor-1">Doctor</label>
+                  <Input
+                    id="doctorId"
+                    name="doctor"
+                  />
+                </div>
+                <div className="grid gap-3">
+                  <label htmlFor="status-1">Estado</label>
+                  <Input
+                    id="status"
+                    name="status"
+                  />
+                </div>
+                <div className="grid gap-3">
+                  <label htmlFor="scheduled-1">Programada para:</label>
+                  <Input
+                    id="scheduled"
+                    name="scheduled"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button type="submit" className="bg-sky-600 text-white">Save changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </form>
+        </Dialog>
       </div>
       <div className="flex flex-row gap-2">
         <Calendar
