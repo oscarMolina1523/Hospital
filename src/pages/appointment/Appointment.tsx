@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type Appointment from "@/entities/appointment.model";
+import Appointment from "@/entities/appointment.model";
 import { DataTable } from "@/components/dataTable";
 import { getAppointmentColumns } from "./appointmentColumns";
 import { useAppointmentContext } from "@/context/AppointmentContext";
@@ -16,8 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import type { AppointmentStatus } from "@/entities/appointment.enum";
 
 const service = new AppointmentService();
 
@@ -27,15 +28,46 @@ const AppointmentPage: React.FC = () => {
     loadingAppointment,
     errorAppointment,
     fetchAppointments,
+    refetchAppointments,
   } = useAppointmentContext();
   const [date, setDate] = React.useState<Date | undefined>(new Date());
+
+  const patientRef = useRef<HTMLInputElement>(null);
+  const departmentRef = useRef<HTMLInputElement>(null);
+  const doctorRef = useRef<HTMLInputElement>(null);
+  const statusRef = useRef<HTMLInputElement>(null);
+  const scheduledRef = useRef<HTMLInputElement>(null);
+  const notesRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     fetchAppointments();
   }, [fetchAppointments]);
 
-  async function handleCreate(appointment: Appointment) {
+  async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault(); // evita que recargue la página
+    e.preventDefault();
+
+    if (!patientRef.current || !departmentRef.current || !doctorRef.current || !statusRef.current || !scheduledRef.current) return;
+
+    const formData = {
+      patientId: patientRef.current.value,
+      departmentId: departmentRef.current.value,
+      doctorId: doctorRef.current.value,
+      status: statusRef.current.value as AppointmentStatus,
+      scheduledAt: new Date(scheduledRef.current.value),
+      notes: notesRef.current?.value || "",
+    };
+    const appointment = Appointment.fromJsonModel(formData);
+
     await service.addAppointment(appointment);
+    await refetchAppointments(); // recarga la lista
+
+    patientRef.current.value = "";
+    departmentRef.current.value = "";
+    doctorRef.current.value = "";
+    statusRef.current.value = "";
+    scheduledRef.current.value = "";
+    if (notesRef.current) notesRef.current.value = "";
   }
 
   async function handleEdit(appointment: Appointment) {
@@ -63,59 +95,56 @@ const AppointmentPage: React.FC = () => {
           <p className="text-[#0f172a] text-[1.25rem] leading-7">Citas</p>
         </div>
         <Dialog>
-          <form>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="bg-sky-600 text-white">Nueva Cita</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+          <DialogTrigger asChild>
+            <Button variant="outline" className="bg-sky-600 text-white">
+              Nueva Cita
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <form onSubmit={handleCreate}>
               <DialogHeader>
                 <DialogTitle>Crear nueva cita</DialogTitle>
                 <DialogDescription>
-                  Estamos creando una nueva cita , se mostrará en la base de datos
+                  Estamos creando una nueva cita , se mostrará en la base de
+                  datos
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4">
                 <div className="grid gap-3">
-                  <label htmlFor="patient-1">Paciente</label>
-                  <Input id="patientId" name="patient" />
+                  <label htmlFor="patientId">Paciente</label>
+                  <Input id="patientId" ref={patientRef} />
                 </div>
                 <div className="grid gap-3">
-                  <label htmlFor="department-1">Departamento</label>
-                  <Input
-                    id="departmentId"
-                    name="department"
-                  />
+                  <label htmlFor="departmentId">Departamento</label>
+                  <Input id="departmentId" ref={departmentRef} />
                 </div>
                 <div className="grid gap-3">
-                  <label htmlFor="doctor-1">Doctor</label>
-                  <Input
-                    id="doctorId"
-                    name="doctor"
-                  />
+                  <label htmlFor="doctorId">Doctor</label>
+                  <Input id="doctorId" ref={doctorRef} />
                 </div>
                 <div className="grid gap-3">
-                  <label htmlFor="status-1">Estado</label>
-                  <Input
-                    id="status"
-                    name="status"
-                  />
+                  <label htmlFor="status">Estado</label>
+                  <Input id="status" ref={statusRef} />
                 </div>
                 <div className="grid gap-3">
-                  <label htmlFor="scheduled-1">Programada para:</label>
-                  <Input
-                    id="scheduled"
-                    name="scheduled"
-                  />
+                  <label htmlFor="scheduledAt">Programada para:</label>
+                  <Input id="scheduledAt" type="datetime-local" ref={scheduledRef} />
+                </div>
+                <div className="grid gap-3">
+                  <label htmlFor="notes">Notas:</label>
+                  <textarea id="notes" ref={notesRef} />
                 </div>
               </div>
               <DialogFooter>
                 <DialogClose asChild>
                   <Button variant="outline">Cancel</Button>
                 </DialogClose>
-                <Button type="submit" className="bg-sky-600 text-white">Save changes</Button>
+                <Button type="submit" className="bg-sky-600 text-white">
+                  Save changes
+                </Button>
               </DialogFooter>
-            </DialogContent>
-          </form>
+            </form>
+          </DialogContent>
         </Dialog>
       </div>
       <div className="flex flex-row gap-2">
