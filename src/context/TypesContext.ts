@@ -1,4 +1,5 @@
 import type Appointment from "@/entities/appointment.model";
+import type AuditLog from "@/entities/auditLog.model";
 import type Billing from "@/entities/billing.model";
 import type Department from "@/entities/department.model";
 import type Expense from "@/entities/expense.model";
@@ -99,4 +100,12 @@ export type DepartmentContextType = {
   errorDepartment?: string;
   fetchDepartments: () => Promise<void>;
   refetchDepartments: () => Promise<void>;
+};
+
+export type LogContextType = {
+  logs: AuditLog[];
+  loadingLog: boolean;
+  errorLog?: string;
+  fetchLogs: () => Promise<void>;
+  refetchLogs: () => Promise<void>;
 };

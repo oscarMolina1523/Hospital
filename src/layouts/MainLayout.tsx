@@ -5,6 +5,7 @@ import { BillingProvider } from "@/context/BillingContext";
 import { DepartmentProvider } from "@/context/DepartmentContext";
 import { ExpenseProvider } from "@/context/ExpenseContext";
 import { InventoryProvider } from "@/context/InventoryContext";
+import { LogProvider } from "@/context/LogContext";
 import { MedicalServiceProvider } from "@/context/MedicalServiceContext";
 import { MedicationProvider } from "@/context/MedicationContext";
 import { PatientProvider } from "@/context/PatientContext";
@@ -21,29 +22,31 @@ const MainLayout: React.FC = () => {
         <div className="w-1/4 px-2">
           <Sidebar />
         </div>
-        <DepartmentProvider>
-          <RoleProvider>
-            <PatientProvider>
-              <MedicalServiceProvider>
-                <MedicationProvider>
-                  <InventoryProvider>
-                    <ExpenseProvider>
-                      <BillingProvider>
-                        <AppointmentProvider>
-                          <UserProvider>
-                            <div className="w-3/4 px-2">
-                              <Outlet />
-                            </div>
-                          </UserProvider>
-                        </AppointmentProvider>
-                      </BillingProvider>
-                    </ExpenseProvider>
-                  </InventoryProvider>
-                </MedicationProvider>
-              </MedicalServiceProvider>
-            </PatientProvider>
-          </RoleProvider>
-        </DepartmentProvider>
+        <LogProvider>
+          <DepartmentProvider>
+            <RoleProvider>
+              <PatientProvider>
+                <MedicalServiceProvider>
+                  <MedicationProvider>
+                    <InventoryProvider>
+                      <ExpenseProvider>
+                        <BillingProvider>
+                          <AppointmentProvider>
+                            <UserProvider>
+                              <div className="w-3/4 px-2">
+                                <Outlet />
+                              </div>
+                            </UserProvider>
+                          </AppointmentProvider>
+                        </BillingProvider>
+                      </ExpenseProvider>
+                    </InventoryProvider>
+                  </MedicationProvider>
+                </MedicalServiceProvider>
+              </PatientProvider>
+            </RoleProvider>
+          </DepartmentProvider>
+        </LogProvider>
       </div>
     </div>
   );
