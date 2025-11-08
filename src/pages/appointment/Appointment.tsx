@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";  // Cambié useRef por useState
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { AppointmentStatus } from "@/entities/appointment.enum";
@@ -30,62 +29,110 @@ const AppointmentPage: React.FC = () => {
     fetchAppointments,
     refetchAppointments,
   } = useAppointmentContext();
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const patientRef = useRef<HTMLInputElement>(null);
-  const departmentRef = useRef<HTMLInputElement>(null);
-  const doctorRef = useRef<HTMLInputElement>(null);
-  const statusRef = useRef<HTMLSelectElement>(null);
-  const scheduledRef = useRef<HTMLInputElement>(null);
-  const notesRef = useRef<HTMLTextAreaElement>(null);
+  // Edit dialog state
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+
+  // Delete confirmation state
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Form states (controlados, reemplazan los refs)
+  const [patientId, setPatientId] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
+  const [doctorId, setDoctorId] = useState("");
+  const [status, setStatus] = useState<AppointmentStatus | "">("");
+  const [scheduledAt, setScheduledAt] = useState("");  // String para datetime-local
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     fetchAppointments();
   }, [fetchAppointments]);
 
-  async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault(); // evita que recargue la página
+  // Unified submit handler for create and edit
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (
-      !patientRef.current ||
-      !departmentRef.current ||
-      !doctorRef.current ||
-      !statusRef.current ||
-      !scheduledRef.current
-    )
-      return;
-
     const formData = {
-      patientId: patientRef.current.value,
-      departmentId: departmentRef.current.value,
-      doctorId: doctorRef.current.value,
-      status: statusRef.current.value as AppointmentStatus,
-      scheduledAt: new Date(scheduledRef.current.value),
-      notes: notesRef.current?.value || "",
+      patientId,
+      departmentId,
+      doctorId,
+      status: status as AppointmentStatus,
+      scheduledAt: new Date(scheduledAt),
+      notes,
     };
-    const appointment = Appointment.fromJsonModel(formData);
 
-    await service.addAppointment(appointment);
-    await refetchAppointments(); // recarga la lista
+    const model = Appointment.fromJsonModel(formData);
 
-    patientRef.current.value = "";
-    departmentRef.current.value = "";
-    doctorRef.current.value = "";
-    statusRef.current.value = "";
-    scheduledRef.current.value = "";
-    if (notesRef.current) notesRef.current.value = "";
+    if (selectedAppointment) {
+      // Update
+      await service.updateAppointment(selectedAppointment.id, model);
+    } else {
+      // Create
+      await service.addAppointment(model);
+    }
+
+    await refetchAppointments();
+    setEditOpen(false);
+    setSelectedAppointment(null);
+
+    // Clear form
+    setPatientId("");
+    setDepartmentId("");
+    setDoctorId("");
+    setStatus("");
+    setScheduledAt("");
+    setNotes("");
   }
 
   async function handleEdit(appointment: Appointment) {
-    await service.updateAppointment(appointment.id, appointment);
+    setSelectedAppointment(appointment);
+    setEditOpen(true);
   }
 
   async function handleDelete(id: string) {
-    await service.deleteAppointment(id);
+    setDeleteId(id);
+    setDeleteOpen(true);
   }
 
   const columns = getAppointmentColumns(handleEdit, handleDelete);
+
+  // Populate edit form when selectedAppointment changes
+  useEffect(() => {
+    if (!selectedAppointment) {
+      // Clear form for create
+      setPatientId("");
+      setDepartmentId("");
+      setDoctorId("");
+      setStatus("");
+      setScheduledAt("");
+      setNotes("");
+      return;
+    }
+
+    // Populate for edit
+    setPatientId(selectedAppointment.patientId);
+    setDepartmentId(selectedAppointment.departmentId);
+    setDoctorId(selectedAppointment.doctorId);
+    setStatus(selectedAppointment.status);
+    setNotes(selectedAppointment.notes || "");
+
+    // Convert scheduledAt to string for datetime-local
+    const d = new Date(selectedAppointment.scheduledAt);
+    const tzOffset = d.getTimezoneOffset() * 60000;
+    const localISO = new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
+    setScheduledAt(localISO);
+  }, [selectedAppointment]);
+
+  async function confirmDelete() {
+    if (!deleteId) return;
+    await service.deleteAppointment(deleteId);
+    await refetchAppointments();
+    setDeleteOpen(false);
+    setDeleteId(null);
+  }
 
   if (loadingAppointment) {
     return <div className="p-4 text-gray-500">Cargando citas...</div>;
@@ -101,74 +148,97 @@ const AppointmentPage: React.FC = () => {
         <div>
           <p className="text-[#0f172a] text-[1.25rem] leading-7">Citas</p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="bg-sky-600 text-white">
-              Nueva Cita
-            </Button>
-          </DialogTrigger>
-          <DialogContent
-            className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto"
-            style={{
-              scrollbarWidth: "none", // Firefox
-              msOverflowStyle: "none", // IE 10+
+        <div>
+          <Button
+            variant="outline"
+            className="bg-sky-600 text-white"
+            onClick={() => {
+              setSelectedAppointment(null);
+              setEditOpen(true);
             }}
           >
-            <form onSubmit={handleCreate}>
+            Nueva Cita
+          </Button>
+        </div>
+        {/* Edit dialog (controlled) */}
+        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+          <DialogContent
+            className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            <form onSubmit={handleSubmit}>
               <DialogHeader>
-                <DialogTitle>Crear nueva cita</DialogTitle>
+                <DialogTitle>
+                  {selectedAppointment ? "Editar cita" : "Nueva cita"}
+                </DialogTitle>
                 <DialogDescription>
-                  Estamos creando una nueva cita , se mostrará en la base de
-                  datos
+                  {selectedAppointment
+                    ? "Actualiza los datos de la cita seleccionada."
+                    : "Ingresa los datos para la nueva cita."}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4">
                 <div className="grid gap-3">
-                  <label htmlFor="patientId">Paciente</label>
-                  <Input id="patientId" ref={patientRef} />
+                  <label htmlFor="editPatientId">Paciente</label>
+                  <Input
+                    id="editPatientId"
+                    value={patientId}
+                    onChange={(e) => setPatientId(e.target.value)}
+                  />
                 </div>
                 <div className="grid gap-3">
-                  <label htmlFor="departmentId">Departamento</label>
-                  <Input id="departmentId" ref={departmentRef} />
+                  <label htmlFor="editDepartmentId">Departamento</label>
+                  <Input
+                    id="editDepartmentId"
+                    value={departmentId}
+                    onChange={(e) => setDepartmentId(e.target.value)}
+                  />
                 </div>
                 <div className="grid gap-3">
-                  <label htmlFor="doctorId">Doctor</label>
-                  <Input id="doctorId" ref={doctorRef} />
+                  <label htmlFor="editDoctorId">Doctor</label>
+                  <Input
+                    id="editDoctorId"
+                    value={doctorId}
+                    onChange={(e) => setDoctorId(e.target.value)}
+                  />
                 </div>
                 <div className="grid gap-3">
-                  <label htmlFor="status">Estado</label>
+                  <label htmlFor="editStatus">Estado</label>
                   <select
-                    id="status"
-                    ref={statusRef}
+                    id="editStatus"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as AppointmentStatus)}
                     className="border rounded-md p-2"
                   >
-                    {Object.values(AppointmentStatus).map((status) => (
-                      <option key={status} value={status}>
-                        {status.charAt(0) + status.slice(1).toLowerCase()}
+                    {Object.values(AppointmentStatus).map((statusOption) => (
+                      <option key={statusOption} value={statusOption}>
+                        {statusOption.charAt(0) + statusOption.slice(1).toLowerCase()}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="grid gap-3">
-                  <label htmlFor="scheduledAt">Programada para:</label>
+                  <label htmlFor="editScheduledAt">Programada para:</label>
                   <Input
-                    id="scheduledAt"
+                    id="editScheduledAt"
                     type="datetime-local"
-                    ref={scheduledRef}
+                    value={scheduledAt}
+                    onChange={(e) => setScheduledAt(e.target.value)}
                   />
                 </div>
                 <div className="grid gap-3">
-                  <label htmlFor="notes">Notas:</label>
+                  <label htmlFor="editNotes">Notas:</label>
                   <textarea
-                    className="border border-gray-400"
-                    id="notes"
-                    ref={notesRef}
+                    className="border border-gray-400 p-2"
+                    id="editNotes"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
                   />
                 </div>
               </div>
               <DialogFooter className="pt-4">
                 <DialogClose asChild>
-                  <Button variant="outline">Cancelar</Button>
+                  <Button variant="outline">Cancel</Button>
                 </DialogClose>
                 <Button type="submit" className="bg-sky-600 text-white">
                   Guardar
@@ -177,7 +247,28 @@ const AppointmentPage: React.FC = () => {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Delete confirmation dialog (controlled) */}
+        <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+          <DialogContent className="sm:max-w-[400px]">
+            <DialogHeader>
+              <DialogTitle>Confirmar eliminación</DialogTitle>
+              <DialogDescription>
+                ¿Estás seguro que deseas eliminar esta cita? Esta acción no se puede deshacer.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancelar</Button>
+              </DialogClose>
+              <Button variant="destructive" onClick={confirmDelete}>
+                Eliminar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
+      {/* Resto del código (calendario, citas del día, tabla) permanece igual */}
       <div className="flex flex-row gap-2">
         <Calendar
           mode="single"
@@ -209,7 +300,7 @@ const AppointmentPage: React.FC = () => {
           ))}
         </div>
         <div className="border flex flex-col gap-4 max-w-92 rounded-2xl p-4 border-gray-300">
-          <p className="font-medium leading-2">Proximas citas</p>
+          <p className="font-medium leading-2">Próximas citas</p>
           {data.slice(0, 3).map((item, index) => (
             <div
               key={index}
@@ -232,7 +323,7 @@ const AppointmentPage: React.FC = () => {
           ))}
         </div>
       </div>
-      {/* table */}
+      {/* Table */}
       <div className="mt-6">
         <DataTable
           columns={columns}
