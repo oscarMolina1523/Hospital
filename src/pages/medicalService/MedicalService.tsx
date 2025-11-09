@@ -1,9 +1,22 @@
 import { Button } from "@/components/ui/button";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { getMedicalServiceColumns } from "./medicalServiceColumns";
-import type MedicalService from "@/entities/medicalService.model";
+import MedicalService from "@/entities/medicalService.model";
 import { DataTable } from "@/components/dataTable";
 import { useMedicalServiceContext } from "@/context/MedicalServiceContext";
+import MedicalServiceService from "@/services/medicalService.service";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+
+const service = new MedicalServiceService();
 
 const MedicalServicePage: React.FC = () => {
   const {
@@ -11,24 +24,98 @@ const MedicalServicePage: React.FC = () => {
     loadingMedicalService,
     errorMedicalService,
     fetchMedicalServices,
+    refetchMedicalServices,
   } = useMedicalServiceContext();
+
+  // Edit dialog state
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedMedicalService, setSelectedMedicalService] =
+    useState<MedicalService | null>(null);
+
+  // Delete confirmation state
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Form states
+  const [name, setName] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
+  const [quantity, setQuantity] = useState(0);
 
   useEffect(() => {
     fetchMedicalServices();
   }, [fetchMedicalServices]);
 
-  function handleEdit(medicalService: MedicalService) {
-    console.log("Editar medicalService:", medicalService);
+  // Unified submit handler for create and edit
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = {
+      name,
+      departmentId,
+      baseCost: quantity,
+      active: true,
+    };
+
+    const model = MedicalService.fromJsonModel(formData);
+
+    if (selectedMedicalService) {
+      // Update
+      await service.updateMedicalService(selectedMedicalService.id, model);
+    } else {
+      // Create
+      await service.addMedicalService(model);
+    }
+
+    await refetchMedicalServices();
+    setEditOpen(false);
+    setSelectedMedicalService(null);
+
+    // Clear form
+    setName("");
+    setDepartmentId("");
+    setQuantity(0);
   }
 
-  function handleDelete(id: string) {
-    console.log("Eliminar inentory con ID:", id);
+  async function handleEdit(medicalService: MedicalService) {
+    setSelectedMedicalService(medicalService);
+    setEditOpen(true);
+  }
+
+  async function handleDelete(id: string) {
+    setDeleteId(id);
+    setDeleteOpen(true);
   }
 
   const columns = getMedicalServiceColumns(handleEdit, handleDelete);
 
+  // Populate edit form when selectedMedicalService changes
+  useEffect(() => {
+    if (!selectedMedicalService) {
+      // Clear form for create
+      setName("");
+      setDepartmentId("");
+      setQuantity(0);
+      return;
+    }
+
+    // Populate for edit
+    setName(selectedMedicalService.name);
+    setDepartmentId(selectedMedicalService.departmentId || "");
+    setQuantity(selectedMedicalService.baseCost);
+  }, [selectedMedicalService]);
+
+  async function confirmDelete() {
+    if (!deleteId) return;
+    await service.deleteMedicalService(deleteId);
+    await refetchMedicalServices();
+    setDeleteOpen(false);
+    setDeleteId(null);
+  }
+
   if (loadingMedicalService) {
-    return <div className="p-4 text-gray-500">Cargando servicios medicos...</div>;
+    return (
+      <div className="p-4 text-gray-500">Cargando servicios medicos...</div>
+    );
   }
 
   if (errorMedicalService) {
@@ -44,8 +131,97 @@ const MedicalServicePage: React.FC = () => {
           </p>
         </div>
         <div>
-          <Button className="bg-sky-600 text-white">Nuevo Servicio</Button>
+          <Button
+            onClick={() => {
+              setSelectedMedicalService(null);
+              setEditOpen(true);
+            }}
+            className="bg-sky-600 text-white"
+          >
+            Nuevo Servicio
+          </Button>
         </div>
+
+        {/* Edit dialog  */}
+        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+          <DialogContent
+            className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            <form onSubmit={handleSubmit}>
+              <DialogHeader>
+                <DialogTitle>
+                  {selectedMedicalService
+                    ? "Editar servicio medico"
+                    : "Nuevo servicio medico"}
+                </DialogTitle>
+                <DialogDescription>
+                  {selectedMedicalService
+                    ? "Actualiza los datos del servicio seleccionado."
+                    : "Ingresa los datos para un nuevo servicio"}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4">
+                <div className="grid gap-3">
+                  <label htmlFor="name">Nombre</label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-3">
+                  <label htmlFor="departmentId">Departamento</label>
+                  <Input
+                    id="departmentId"
+                    value={departmentId}
+                    onChange={(e) => setDepartmentId(e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-3">
+                  <label htmlFor="editAmount">Monto:</label>
+                  <Input
+                    className="border border-gray-400 p-2"
+                    id="editAmount"
+                    type="number"
+                    value={quantity === 0 ? "" : quantity}
+                    min={0}
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                  />
+                </div>
+              </div>
+              <DialogFooter className="pt-4">
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button type="submit" className="bg-sky-600 text-white">
+                  Guardar
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete confirmation dialog  */}
+        <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+          <DialogContent className="sm:max-w-[400px]">
+            <DialogHeader>
+              <DialogTitle>Confirmar eliminación</DialogTitle>
+              <DialogDescription>
+                ¿Estás seguro que deseas eliminar este servicio medico? Esta acción
+                no se puede deshacer.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancelar</Button>
+              </DialogClose>
+              <Button variant="destructive" onClick={confirmDelete}>
+                Eliminar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
       {/* table */}
       <div className="mt-6 w-full">
