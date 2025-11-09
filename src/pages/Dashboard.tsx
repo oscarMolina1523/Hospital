@@ -3,23 +3,23 @@ import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { type ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "#2563eb",
+  expense: {
+    label: "expense",
+    color: "#FF0001",
   },
-  mobile: {
-    label: "Mobile",
-    color: "#60a5fa",
+  profit: {
+    label: "profit",
+    color: "#43ff64d9",
   },
 } satisfies ChartConfig;
 
 const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { month: "January", expense: 186, profit: 80 },
+  { month: "February", expense: 305, profit: 200 },
+  { month: "March", expense: 237, profit: 120 },
+  { month: "April", expense: 73, profit: 190 },
+  { month: "May", expense: 209, profit: 130 },
+  { month: "June", expense: 214, profit: 140 },
 ];
 
 const DashboardPage: React.FC = () => {
@@ -37,8 +37,8 @@ const DashboardPage: React.FC = () => {
           />
           <ChartTooltip content={<ChartTooltipContent />} />
           <ChartLegend content={<ChartLegendContent />} />
-          <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-          <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+          <Bar dataKey="expense" fill="var(--color-expense)" radius={4} />
+          <Bar dataKey="profit" fill="var(--color-profit)" radius={4} />
         </BarChart>
       </ChartContainer>
     </div>
