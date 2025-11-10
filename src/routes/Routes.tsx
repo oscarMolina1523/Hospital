@@ -16,6 +16,7 @@ import RegisterPage from "@/pages/Register";
 import RolePage from "@/pages/role/Role";
 import UserPage from "@/pages/user/User";
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import ProtectedRoute from "./protectedRoutes";
 
 const router = createBrowserRouter([
   {
@@ -24,25 +25,29 @@ const router = createBrowserRouter([
     children: [
       {
         index: true, // Esta propiedad indica que esta es la ruta por defecto
-        element: <Navigate to="login" /> 
+        element: <Navigate to="login" />,
       },
       {
         path: "login",
-        element: <LoginPage />
+        element: <LoginPage />,
       },
       {
         path: "register",
-        element: <RegisterPage />
+        element: <RegisterPage />,
       },
     ],
   },
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
-        element: <Navigate to="/home" />
+        element: <Navigate to="/home" />,
       },
       {
         path: "home",
@@ -50,47 +55,47 @@ const router = createBrowserRouter([
       },
       {
         path: "billing",
-        element: <BillingPage/>,
+        element: <BillingPage />,
       },
       {
         path: "expense",
-        element: <ExpensePage/>,
+        element: <ExpensePage />,
       },
       {
         path: "inventory",
-        element: <InventoryPage/>,
+        element: <InventoryPage />,
       },
       {
         path: "medication",
-        element: <MedicationPage/>,
+        element: <MedicationPage />,
       },
       {
         path: "medical-service",
-        element: <MedicalServicePage/>,
+        element: <MedicalServicePage />,
       },
       {
         path: "user",
-        element: <UserPage/>,
+        element: <UserPage />,
       },
       {
         path: "patient",
-        element: <PatientPage/>,
+        element: <PatientPage />,
       },
       {
         path: "role",
-        element: <RolePage/>,
+        element: <RolePage />,
       },
       {
         path: "department",
-        element: <DepartmentPage/>,
+        element: <DepartmentPage />,
       },
       {
         path: "log",
-        element: <AuditLogPage/>,
+        element: <AuditLogPage />,
       },
       {
         path: "dashboard",
-        element: <DashboardPage/>,
+        element: <DashboardPage />,
       },
     ],
   },
