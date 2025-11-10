@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "@/services/auth.service";
+import { getUserFromToken } from "@/hooks/getUserFromToken";
+import { rolePermissions } from "@/hooks/useRolePermitions";
 
 const authService = new AuthService();
 
@@ -32,7 +34,14 @@ const LoginPage: React.FC = () => {
     try {
       const token = await authService.signIn(email, password);
       localStorage.setItem("authToken", token.token);
-      navigate("/home");
+
+      // After storing token, decode user and redirect to first allowed route for their role
+      const user = getUserFromToken();
+      if (user && user.roleId && rolePermissions[user.roleId] && rolePermissions[user.roleId].length > 0) {
+        navigate(rolePermissions[user.roleId][0]);
+      } else {
+        navigate("/home");
+      }
     } catch (error) {
       setError(`${error}`);
     }
