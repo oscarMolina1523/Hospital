@@ -15,6 +15,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useDepartmentContext } from "@/context/DepartmentContext";
+import { useMedicationContext } from "@/context/MedicationContext";
+import { useUserContext } from "@/context/UserContext";
+import { useEntityMap } from "@/hooks/useEntityMap";
 
 const service = new InventoryService();
 
@@ -26,6 +30,10 @@ const InventoryPage: React.FC = () => {
     fetchInventories,
     refetchInventories,
   } = useInventoryContext();
+
+  const { departments } = useDepartmentContext();
+  const { medications } = useMedicationContext();
+  const { users } = useUserContext();
 
   // Edit dialog state
   const [editOpen, setEditOpen] = useState(false);
@@ -86,6 +94,20 @@ const InventoryPage: React.FC = () => {
   }
 
   const columns = getInventoryColumns(handleEdit, handleDelete);
+
+  const departmentsMap = useEntityMap(departments, "id", "name");
+  const medicationsMap = useEntityMap(medications, "id", "name");
+  const usersMap = useEntityMap(users, "id", "username");
+
+  const enrichedData = React.useMemo(() => {
+    return data.map((a) => ({
+      ...a,
+      medicationName: medicationsMap[a.medicationId] ?? a.medicationId,
+      departmentName: departmentsMap[a.departmentId] ?? a.departmentId,
+      creatorName: usersMap[a.createdBy!] ?? a.createdBy,
+      updaterName: usersMap[a.updatedBy!] ?? a.updatedBy,
+    }));
+  }, [data, medicationsMap, usersMap, departmentsMap]);
 
   const lowStockItems = data.filter((item) => item.quantity < 50);
 
@@ -208,8 +230,8 @@ const InventoryPage: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Confirmar eliminación</DialogTitle>
               <DialogDescription>
-                ¿Estás seguro que deseas eliminar este inventario? Esta acción no se
-                puede deshacer.
+                ¿Estás seguro que deseas eliminar este inventario? Esta acción
+                no se puede deshacer.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -227,8 +249,8 @@ const InventoryPage: React.FC = () => {
       <div className="mt-6 w-full">
         <DataTable
           columns={columns}
-          data={data}
-          filterColumn="medicationId"
+          data={enrichedData as unknown as Inventory[]}
+          filterColumn="medicationName"
           filterPlaceholder="Filtrar por medicamento..."
         />
       </div>

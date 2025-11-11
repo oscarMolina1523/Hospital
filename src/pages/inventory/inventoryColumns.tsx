@@ -10,14 +10,14 @@ export function getInventoryColumns(
 ): ColumnDef<Inventory>[] {
   return [
     {
-      accessorKey: "departmentId",
+      accessorKey: "departmentName",
       header: "Departamento",
-      cell: ({ row }) => <div>{row.getValue("departmentId")}</div>,
+      cell: ({ row }) => <div>{row.getValue("departmentName") ?? row.getValue("departmentId")}</div>,
     },
     {
-      accessorKey: "medicationId",
+      accessorKey: "medicationName",
       header: "Medicamento",
-      cell: ({ row }) => <div>{row.getValue("medicationId")}</div>,
+      cell: ({ row }) => <div>{ row.getValue("medicationName") ?? row.getValue("medicationId")}</div>,
     },
     {
       accessorKey: "quantity",
@@ -38,41 +38,41 @@ export function getInventoryColumns(
       },
     },
     {
-      accessorKey: "createdBy",
+      accessorKey: "creatorName",
       header: "Creado por",
-      cell: ({ row }) => <div>{row.getValue("createdBy")}</div>,
+      cell: ({ row }) => <div>{ row.getValue("creatorName") ?? row.getValue("createdBy")}</div>,
     },
     {
-      accessorKey: "updatedBy",
+      accessorKey: "updaterName",
       header: "Actualizado por",
-      cell: ({ row }) => <div>{row.getValue("updatedBy")}</div>,
+      cell: ({ row }) => <div>{ row.getValue("updaterName") ?? row.getValue("updatedBy")}</div>,
     },
-    {
-      accessorKey: "createdAt",
-      header: "Creado",
-      cell: ({ row }) => {
-        const date = new Date(row.getValue("createdAt"));
-        return date.toLocaleDateString("es-NI", {
-          weekday: "short",
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        });
-      },
-    },
-    {
-      accessorKey: "updatedAt",
-      header: "Actualizado",
-      cell: ({ row }) => {
-        const date = new Date(row.getValue("updatedAt"));
-        return date.toLocaleDateString("es-NI", {
-          weekday: "short",
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        });
-      },
-    },
+    // {
+    //   accessorKey: "createdAt",
+    //   header: "Creado",
+    //   cell: ({ row }) => {
+    //     const date = new Date(row.getValue("createdAt"));
+    //     return date.toLocaleDateString("es-NI", {
+    //       weekday: "short",
+    //       day: "2-digit",
+    //       month: "short",
+    //       year: "numeric",
+    //     });
+    //   },
+    // },
+    // {
+    //   accessorKey: "updatedAt",
+    //   header: "Actualizado",
+    //   cell: ({ row }) => {
+    //     const date = new Date(row.getValue("updatedAt"));
+    //     return date.toLocaleDateString("es-NI", {
+    //       weekday: "short",
+    //       day: "2-digit",
+    //       month: "short",
+    //       year: "numeric",
+    //     });
+    //   },
+    // },
     {
       id: "actions",
       header: "Acciones",
