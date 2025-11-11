@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { AppointmentStatus } from "@/entities/appointment.enum";
+import { useEntityMap } from "@/hooks/useEntityMap";
 
 const service = new AppointmentService();
 
@@ -107,23 +108,9 @@ const AppointmentPage: React.FC = () => {
   const { users } = useUserContext();
   const { departments } = useDepartmentContext();
 
-  const patientsMap = React.useMemo(() => {
-    const m: Record<string, string> = {};
-    for (const p of patients) m[p.id] = `${p.firstName || ""} ${p.lastName || ""}`.trim() || p.id;
-    return m;
-  }, [patients]);
-
-  const usersMap = React.useMemo(() => {
-    const m: Record<string, string> = {};
-    for (const u of users) m[u.id] = u.username || u.id;
-    return m;
-  }, [users]);
-
-  const departmentsMap = React.useMemo(() => {
-    const m: Record<string, string> = {};
-    for (const d of departments) m[d.id] = d.name || d.id;
-    return m;
-  }, [departments]);
+  const usersMap= useEntityMap(users, "id", "username");
+  const departmentsMap= useEntityMap(departments, "id", "name");
+  const patientsMap= useEntityMap(patients, "id", "fullName");
 
   // Enrich appointments with readable names (no extra API calls)
   const enrichedData = React.useMemo(() => {

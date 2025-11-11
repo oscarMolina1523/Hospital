@@ -3,14 +3,15 @@ import BaseModel from "./base.model";
 export default class Patient extends BaseModel {
   firstName: string;
   lastName: string;
+  fullName?:string;
   birthDate: Date;
   gender: string;
   departmentId: string;
   medicalHistory: string; // JSON o tabla relacionada
   createdAt?: Date;
   updatedAt?: Date;
-  createdBy?: string; 
-  updatedBy?: string; 
+  createdBy?: string;
+  updatedBy?: string;
 
   constructor({
     id,
@@ -48,6 +49,8 @@ export default class Patient extends BaseModel {
     this.updatedAt = updatedAt;
     this.createdBy = createdBy;
     this.updatedBy = updatedBy;
+
+    this.fullName = `${this.firstName ?? ""} ${this.lastName ?? ""}`.trim();
   }
 
 
@@ -55,12 +58,18 @@ export default class Patient extends BaseModel {
     const id = String(json["id"] || "");
     const firstName = String(json["firstName"] || "");
     const lastName = String(json["lastName"] || "");
-    const birthDate = json["birthDate"] ? new Date(json["birthDate"]) : new Date();
+    const birthDate = json["birthDate"]
+      ? new Date(json["birthDate"])
+      : new Date();
     const gender = String(json["gender"] || "");
     const departmentId = String(json["departmentId"] || "");
     const medicalHistory = String(json["medicalHistory"] || "");
-    const createdAt = json["createdAt"] ? new Date(json["createdAt"]) : undefined;
-    const updatedAt = json["updatedAt"] ? new Date(json["updatedAt"]) : undefined;
+    const createdAt = json["createdAt"]
+      ? new Date(json["createdAt"])
+      : undefined;
+    const updatedAt = json["updatedAt"]
+      ? new Date(json["updatedAt"])
+      : undefined;
     const createdBy = json["createdBy"] ? String(json["createdBy"]) : undefined;
     const updatedBy = json["updatedBy"] ? String(json["updatedBy"]) : undefined;
 
@@ -83,7 +92,9 @@ export default class Patient extends BaseModel {
     const id = String(json["id"] || "");
     const firstName = String(json["firstName"] || "");
     const lastName = String(json["lastName"] || "");
-    const birthDate = json["birthDate"] ? new Date(json["birthDate"]) : new Date();
+    const birthDate = json["birthDate"]
+      ? new Date(json["birthDate"])
+      : new Date();
     const gender = String(json["gender"] || "");
     const departmentId = String(json["departmentId"] || "");
     const medicalHistory = String(json["medicalHistory"] || "");

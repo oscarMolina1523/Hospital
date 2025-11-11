@@ -1,16 +1,13 @@
 import { useRoleContext } from "@/context/RoleContext";
 import { getUserFromToken } from "@/hooks/getUserFromToken";
+import { useEntityMap } from "@/hooks/useEntityMap";
 import React from "react";
 
 const Navbar: React.FC = () => {
   const { roles } = useRoleContext();
   const data = getUserFromToken();
 
-  const rolesMap = React.useMemo(() => {
-    const m: Record<string, string> = {};
-    for (const p of roles) m[p.id] = p.name || p.id;
-    return m;
-  }, [roles]);
+  const rolesMap= useEntityMap(roles, "id", "name");
 
   return (
     <div className="h-20 w-screen flex flex-row bg-white">
