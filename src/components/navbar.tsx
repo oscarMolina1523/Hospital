@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
   const rolesMap= useEntityMap(roles, "id", "name");
 
   return (
-    <div className="h-20 w-screen flex flex-row bg-white">
+    <div className="h-20 w-screen flex flex-row bg-white fixed z-20">
       <div className="w-1/2 h-full flex items-center justify-start p-8 leading-7">
         <p className="text-[#0f172a] text-[1.25rem] font-semibold">
           Hospital Manager

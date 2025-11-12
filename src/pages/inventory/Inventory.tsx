@@ -144,7 +144,7 @@ const InventoryPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-white h-full rounded-2xl items-start justify-start flex flex-col gap-2 p-4">
+    <div className="bg-white rounded-2xl items-start justify-start flex flex-col gap-2 p-4">
       <div className="w-full flex flex-row items-center justify-between">
         <div>
           <p className="text-[#0f172a] text-[1.25rem] leading-7">Inventarios</p>

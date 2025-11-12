@@ -19,8 +19,8 @@ const MainLayout: React.FC = () => {
     <div className="w-full h-full flex flex-col gap-4">
       <RoleProvider>
         <Navbar />
-        <div className="w-full flex flex-row h-full">
-          <div className="w-1/4 px-2">
+        <div className="w-full flex flex-row h-screen">
+          <div className="w-80 px-2 fixed left-0 top-24">
             <Sidebar />
           </div>
           <LogProvider>
@@ -33,7 +33,13 @@ const MainLayout: React.FC = () => {
                         <BillingProvider>
                           <AppointmentProvider>
                             <UserProvider>
-                              <div className="w-3/4 px-2">
+                              <div
+                                className="ml-80 mt-24 w-3/4 px-2 overflow-y-auto min-h-full"
+                                style={{
+                                  scrollbarWidth: "none",
+                                  msOverflowStyle: "none",
+                                }}
+                              >
                                 <Outlet />
                               </div>
                             </UserProvider>
