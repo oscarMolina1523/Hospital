@@ -62,7 +62,6 @@ const AppointmentPage: React.FC = () => {
   const user = getUserFromToken();
 
   useEffect(() => {
-    console.log("user", JSON.stringify(user));
 
     //it means user has a department
     if (user && user.departmentId) {

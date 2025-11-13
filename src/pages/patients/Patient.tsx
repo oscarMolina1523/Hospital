@@ -15,17 +15,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { getUserFromToken } from "@/hooks/getUserFromToken";
 
 const service = new PatientService();
 
 const PatientPage: React.FC = () => {
   const {
-    patients: data,
+    patients,
+    patientsByDepartment,
     loadingPatient,
     errorPatient,
     fetchPatients,
     refetchPatients,
+    fetchPatientsByDepartment,
   } = usePatientContext();
+
 
   // Edit dialog state
   const [editOpen, setEditOpen] = useState(false);
@@ -43,9 +47,24 @@ const PatientPage: React.FC = () => {
   const [departmentId, setDepartmentId] = useState("");
   const [medicalHistory, setMedicalHistory] = useState("");
 
+  // useEffect(() => {
+  //   fetchPatients();
+  // }, [fetchPatients]);
+  
+  const user = getUserFromToken();
+
   useEffect(() => {
-    fetchPatients();
-  }, [fetchPatients]);
+    //it means user has a department
+    if (user && user.departmentId) {
+      fetchPatientsByDepartment();
+    } else {
+      //it means user doesn't have department he is a ceo, junta or gerente general
+      fetchPatients();
+    }
+  }, [fetchPatients, fetchPatientsByDepartment]);
+
+  const dataToUse =
+    user && user.departmentId ? patientsByDepartment : patients;
 
   // Unified submit handler for create and edit
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -267,7 +286,7 @@ const PatientPage: React.FC = () => {
       <div className="mt-6 w-full">
         <DataTable
           columns={columns}
-          data={data}
+          data={dataToUse}
           filterColumn="firstName"
           filterPlaceholder="Filtrar por nombre..."
         />
