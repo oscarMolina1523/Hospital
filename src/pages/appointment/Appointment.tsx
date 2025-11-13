@@ -22,22 +22,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { AppointmentStatus } from "@/entities/appointment.enum";
 import { useEntityMap } from "@/hooks/useEntityMap";
+import { getUserFromToken } from "@/hooks/getUserFromToken";
 
 const service = new AppointmentService();
 
 const AppointmentPage: React.FC = () => {
   const {
-    appointments: data,
+    appointments,
+    appointmentsByDepartment,
     loadingAppointment,
     errorAppointment,
     fetchAppointments,
+    fetchAppointmentsByDepartment,
     refetchAppointments,
   } = useAppointmentContext();
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   // Edit dialog state
   const [editOpen, setEditOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
 
   // Delete confirmation state
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -48,12 +52,29 @@ const AppointmentPage: React.FC = () => {
   const [departmentId, setDepartmentId] = useState("");
   const [doctorId, setDoctorId] = useState("");
   const [status, setStatus] = useState<AppointmentStatus | "">("");
-  const [scheduledAt, setScheduledAt] = useState("");  // String para datetime-local
+  const [scheduledAt, setScheduledAt] = useState(""); // String para datetime-local
   const [notes, setNotes] = useState("");
 
+  // useEffect(() => {
+  //   fetchAppointments();
+  // }, [fetchAppointments]);
+
+  const user = getUserFromToken();
+
   useEffect(() => {
-    fetchAppointments();
-  }, [fetchAppointments]);
+    console.log("user", JSON.stringify(user));
+
+    //it means user has a department
+    if (user && user.departmentId) {
+      fetchAppointmentsByDepartment();
+    } else {
+      //it means user doesn't have department he is a ceo, junta or gerente general
+      fetchAppointments();
+    }
+  }, [fetchAppointments, fetchAppointmentsByDepartment]);
+
+  const dataToUse =
+    user && user.departmentId ? appointmentsByDepartment : appointments;
 
   // Unified submit handler for create and edit
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -102,25 +123,25 @@ const AppointmentPage: React.FC = () => {
   }
 
   const columns = getAppointmentColumns(handleEdit, handleDelete);
-  
+
   // Build lookup maps from global contexts so we can enrich appointments without extra requests
   const { patients } = usePatientContext();
   const { users } = useUserContext();
   const { departments } = useDepartmentContext();
 
-  const usersMap= useEntityMap(users, "id", "username");
-  const departmentsMap= useEntityMap(departments, "id", "name");
-  const patientsMap= useEntityMap(patients, "id", "fullName");
+  const usersMap = useEntityMap(users, "id", "username");
+  const departmentsMap = useEntityMap(departments, "id", "name");
+  const patientsMap = useEntityMap(patients, "id", "fullName");
 
   // Enrich appointments with readable names (no extra API calls)
   const enrichedData = React.useMemo(() => {
-    return data.map((a) => ({
+    return dataToUse.map((a) => ({
       ...a,
       patientName: patientsMap[a.patientId] ?? a.patientId,
       doctorName: usersMap[a.doctorId] ?? a.doctorId,
       departmentName: departmentsMap[a.departmentId] ?? a.departmentId,
     }));
-  }, [data, patientsMap, usersMap, departmentsMap]);
+  }, [dataToUse, patientsMap, usersMap, departmentsMap]);
 
   // Populate edit form when selectedAppointment changes
   useEffect(() => {
@@ -145,7 +166,9 @@ const AppointmentPage: React.FC = () => {
     // Convert scheduledAt to string for datetime-local
     const d = new Date(selectedAppointment.scheduledAt);
     const tzOffset = d.getTimezoneOffset() * 60000;
-    const localISO = new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
+    const localISO = new Date(d.getTime() - tzOffset)
+      .toISOString()
+      .slice(0, 16);
     setScheduledAt(localISO);
   }, [selectedAppointment]);
 
@@ -230,12 +253,15 @@ const AppointmentPage: React.FC = () => {
                   <select
                     id="editStatus"
                     value={status}
-                    onChange={(e) => setStatus(e.target.value as AppointmentStatus)}
+                    onChange={(e) =>
+                      setStatus(e.target.value as AppointmentStatus)
+                    }
                     className="border rounded-md p-2"
                   >
                     {Object.values(AppointmentStatus).map((statusOption) => (
                       <option key={statusOption} value={statusOption}>
-                        {statusOption.charAt(0) + statusOption.slice(1).toLowerCase()}
+                        {statusOption.charAt(0) +
+                          statusOption.slice(1).toLowerCase()}
                       </option>
                     ))}
                   </select>
@@ -277,7 +303,8 @@ const AppointmentPage: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Confirmar eliminación</DialogTitle>
               <DialogDescription>
-                ¿Estás seguro que deseas eliminar esta cita? Esta acción no se puede deshacer.
+                ¿Estás seguro que deseas eliminar esta cita? Esta acción no se
+                puede deshacer.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

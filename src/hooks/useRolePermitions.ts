@@ -18,7 +18,7 @@ export const rolePermissions: Record<string, string[]> = {
     "/dashboard",
   ],
   "r-recepcionista": ["/home", "/patient", "/billing"],
-  "r-medico": ["/home", "/patient", "/medical-service", "/medication"],
+  "r-medico": ["/home", "/patient", "/medical-service", "/medication", "/inventory"],
   "r-farmaceutico": ["/inventory", "/medication"],
   "r-laboratorista": ["/medical-service", "/patient"],
   "r-enfermero": ["/medical-service", "/patient"],
