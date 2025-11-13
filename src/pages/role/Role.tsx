@@ -113,8 +113,8 @@ const RolePage: React.FC = () => {
     return <div className="p-4 text-gray-500">Cargando roles...</div>;
   }
 
-  if (loadingRole) {
-    return <div className="p-4 text-red-600">Error: {loadingRole}</div>;
+  if (errorRole) {
+    return <div className="p-4 text-red-600">Error: {errorRole}</div>;
   }
 
   return (
